@@ -13,7 +13,7 @@ var port = 4568;
 // Remove the 'x' from beforeEach block when working on
 // authentication tests.
 /************************************************************/
-var beforeEach = function() {};
+var xbeforeEach = function() {};
 /************************************************************/
 
 
@@ -123,7 +123,7 @@ describe('', function() {
     });
   });
 
-  xdescribe('Account Creation:', function() {
+  describe('Account Creation:', function() {
 
     it('signup creates a new user record', function(done) {
       var options = {
@@ -610,7 +610,7 @@ describe('', function() {
       }
     };
 
-    beforeEach(function(done) {
+    xbeforeEach(function(done) {
       var options = {
         'method': 'POST',
         'followAllRedirects': true,
