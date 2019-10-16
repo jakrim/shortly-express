@@ -15,6 +15,7 @@ app.use(partials());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // app.use(Auth());
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -149,34 +150,32 @@ app.get('/logout', (req, res, next) => {
     })
     .error(error => {
       res.status(500).send(error);
-    });
-});
 
-/************************************************************/
-// Handle the code parameter route last - if all other routes fail
-// assume the route is a short code and try and handle it here.
-// If the short-code doesn't exist, send the user to '/'
-/************************************************************/
+      /************************************************************/
+      // Handle the code parameter route last - if all other routes fail
+      // assume the route is a short code and try and handle it here.
+      // If the short-code doesn't exist, send the user to '/'
+      /************************************************************/
 
-app.get('/:code', (req, res, next) => {
-  return models.Links.get({ code: req.params.code })
-    .tap(link => {
-      if (!link) {
-        throw new Error('Link does not exist');
-      }
-      return models.Clicks.create({ linkId: link.id });
-    })
-    .tap(link => {
-      return models.Links.update(link, { visits: link.visits + 1 });
-    })
-    .then(({ url }) => {
-      res.redirect(url);
-    })
-    .error(error => {
-      res.status(500).send(error);
-    })
-    .catch(() => {
-      res.redirect('/');
+      return models.Links.get({ code: req.params.code })
+        .tap(link => {
+          if (!link) {
+            throw new Error('Link does not exist');
+          }
+          return models.Clicks.create({ linkId: link.id });
+        })
+        .tap(link => {
+          return models.Links.update(link, { visits: link.visits + 1 });
+        })
+        .then(({ url }) => {
+          res.redirect(url);
+        })
+        .error(error => {
+          res.status(500).send(error);
+        })
+        .catch(() => {
+          res.redirect('/');
+        });
     });
 });
 
