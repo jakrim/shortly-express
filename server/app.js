@@ -15,8 +15,6 @@ app.use(partials());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// app.use(Auth());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', (req, res) => {
@@ -176,6 +174,28 @@ app.get('/logout', (req, res, next) => {
         .catch(() => {
           res.redirect('/');
         });
+    });
+});
+
+app.get('/:code', (req, res, next) => {
+  return models.Links.get({ code: req.params.code })
+    .tap(link => {
+      if (!link) {
+        throw new Error('Link does not exist');
+      }
+      return models.Clicks.create({ linkId: link.id });
+    })
+    .tap(link => {
+      return models.Links.update(link, { visits: link.visits + 1 });
+    })
+    .then(({ url }) => {
+      res.redirect(url);
+    })
+    .error(error => {
+      res.status(500).send(error);
+    })
+    .catch(() => {
+      res.redirect('/');
     });
 });
 
